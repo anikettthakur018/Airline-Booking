@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Booking</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Book Your Flight</h1>
+
+    <form id="bookingForm" action="submit_booking.php" method="POST">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="mobile">Mobile Number:</label>
+        <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" required>
+
+        <div id="errorMessage"></div>
+        <label for="from">From:</label>
+        <select id="from" name="from" required>
+            <option value="">Select Departure City</option>
+            <option value="Delhi">Delhi (DEL)</option>
+            <option value="Mumbai">Mumbai (BOM)</option>
+            <option value="Bengaluru">Bengaluru (BLR)</option>
+            <option value="Hyderabad">Hyderabad (HYD)</option>
+            <option value="Chennai">Chennai (MAA)</option>
+            <option value="Kolkata">Kolkata (CCU)</option>
+            <option value="Ahmedabad">Ahmedabad (AMD)</option>
+            <option value="Goa">Goa (GOI)</option>
+            <option value="Pune">Pune (PNQ)</option>
+            <option value="Jaipur">Jaipur (JAI)</option>
+        </select>
+
+        <label for="to">To:</label>
+        <select id="to" name="to" required>
+            <option value="">Select Destination City</option>
+            <option value="Delhi">Delhi (DEL)</option>
+            <option value="Mumbai">Mumbai (BOM)</option>
+            <option value="Bengaluru">Bengaluru (BLR)</option>
+            <option value="Hyderabad">Hyderabad (HYD)</option>
+            <option value="Chennai">Chennai (MAA)</option>
+            <option value="Kolkata">Kolkata (CCU)</option>
+            <option value="Ahmedabad">Ahmedabad (AMD)</option>
+            <option value="Goa">Goa (GOI)</option>
+            <option value="Pune">Pune (PNQ)</option>
+            <option value="Jaipur">Jaipur (JAI)</option>
+        </select>
+
+        <label for="date">Travel Date:</label>
+        <input type="date" id="date" name="travel_date" required>
+
+        <label for="time">Travel Time:</label>
+        <select id="time" name="time" required style="width: 200px; height: 40px;">
+            <option value="">--Select Time--</option>
+            <option value="08:00 AM">08:00 AM</option>
+            <option value="10:30 AM">10:30 AM</option>
+            <option value="01:00 PM">01:00 PM</option>
+            <option value="04:30 PM">04:30 PM</option>
+            <option value="08:00 PM">08:00 PM</option>
+        </select>
+
+        <label for="flight">Select Flight:</label>
+        <select id="flight" name="flight_id" required>
+            <option value="">Select Airlines</option>
+            <option value="IndiGo">IndiGo</option>
+            <option value="SpiceJet">SpiceJet</option>
+            <option value="AirIndia">AirIndia</option>
+            <option value="Vistara">Vistara</option>
+            <option value="Emirates">Emirates</option>
+        </select>
+
+        <label for="class">Class:</label>
+        <select id="class" name="travel_class" required>
+            <option value="Economy">Economy</option>
+            <option value="Premium Economy">Premium Economy</option>
+            <option value="Business">Business</option>
+        </select>
+
+        <button type="submit">Book Now</button>
+    </form>
+
+    <!-- Reservation Confirmation Details Section -->
+    <div class="reservation-details" id="reservationDetails" style="display:none; margin-top:30px;">
+        <div class="reservation-confirmation">
+            <h2>Your Reservation Details</h2>
+            <div class="details-card">
+                <p><strong>Name:</strong> <span id="displayName">-</span></p>
+                <p><strong>Email:</strong> <span id="displayEmail">-</span></p>
+                <p><strong>Mobile:</strong> <span id="displayMobile">-</span></p>
+                <p><strong>From:</strong> <span id="displayFrom">-</span></p>
+                <p><strong>To:</strong> <span id="displayTo">-</span></p>
+                <p><strong>Date:</strong> <span id="displayDate">-</span></p>
+                <p><strong>Time:</strong> <span id="displayTime">-</span></p>
+                <p><strong>Flight:</strong> <span id="displayFlight">-</span></p>
+                <p><strong>Class:</strong> <span id="displayClass">-</span></p>
+                <p style="color: green; font-weight: bold;">Your reservation will be confirmed shortly.</p>
+          
+    </div>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+        
+            const from = document.getElementById('from').value.trim();
+            const to = document.getElementById('to').value.trim();
+            const errorMessageDiv = document.getElementById('errorMessage');
+        
+            if (from.toLowerCase() === to.toLowerCase()) {
+                errorMessageDiv.innerText = '❌ Error: "From" and "To" locations cannot be the same.';
+                errorMessageDiv.style.display = 'block';
+                errorMessageDiv.classList.remove('shake');
+                void errorMessageDiv.offsetWidth;
+                errorMessageDiv.classList.add('shake');
+                return;
+            } else {
+                errorMessageDiv.innerText = '';
+                errorMessageDiv.style.display = 'none';
+            }
+        
+            const formData = new FormData(this);
+        
+            fetch('submit_booking.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                // Show reservation section
+                document.getElementById('displayName').innerText = formData.get('name');
+                document.getElementById('displayEmail').innerText = formData.get('email');
+                document.getElementById('displayMobile').innerText = formData.get('mobile');
+                document.getElementById('displayFrom').innerText = formData.get('from');
+                document.getElementById('displayTo').innerText = formData.get('to');
+                document.getElementById('displayDate').innerText = formData.get('travel_date');
+                document.getElementById('displayTime').innerText = formData.get('time');
+                document.getElementById('displayFlight').innerText = formData.get('flight_id');
+                document.getElementById('displayClass').innerText = formData.get('travel_class');
+                document.getElementById('reservationDetails').style.display = 'block';
+        
+                // Optional: Show confirmation alert or insert `result` somewhere
+                alert(result);
+        
+                // Reset form
+                document.getElementById('bookingForm').reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ There was a problem submitting your booking.');
+            });
+        });
+        </script>
+        
+    
+        
+    
+
+
+</body>
+</html>
